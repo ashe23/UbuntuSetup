@@ -92,6 +92,8 @@ install_YandexDisk() {
 install_OpenGL() {
     apt-get install freeglut3 freeglut3-dev
     apt-get install binutils-gold
+    # need this libs for ubuntu
+    apt-get install libxmu-dev libxi-dev
 }
 
 install_MC() {
