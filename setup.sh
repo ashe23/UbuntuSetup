@@ -1,5 +1,6 @@
 #!/bin/bash    
 
+# TODO add JAVA installer , think about phpstorm,clion and manager to check which program is installed which not
 YANDEXDISK='http://repo.yandex.ru/yandex-disk/yandex-disk_latest_amd64.deb'
 #Text colors
 RED='\033[0;31m'
@@ -14,7 +15,7 @@ RESET_BACK_COLOR='\033[m' # Reset Background color
   
 checkForRoot() {
 	if [ "$(id -u)" != "0" ]; then
-	   echo "${RED}This script must be run as root${RESET}" 1>&2
+	   echo "${RED}This script must be run as root ${RESET}" 1>&2
 	   exit 1
 	fi
 }
@@ -86,6 +87,11 @@ install_YandexDisk() {
 	wget -P $HOME $YANDEXDISK
 	cd $HOME
 	dpkg -i yandex-disk_latest_amd64.deb	
+}
+
+install_OpenGL() {
+    apt-get install freeglut3 freeglut3-dev
+    apt-get install binutils-gold
 }
 
 install_MC() {
@@ -174,6 +180,7 @@ install_YOUTUBEDL() {
 installOScomponents() {
 	apt-get update
 	createAliasFile
+	install_OpenGL
 	install_MC
 	install_Git
 	install_HTOP
