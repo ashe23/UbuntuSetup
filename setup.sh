@@ -1,45 +1,66 @@
 #!/bin/bash    
 
-# TODO add JAVA installer , think about phpstorm,clion and manager to check which program is installed which not
-YANDEXDISK='http://repo.yandex.ru/yandex-disk/yandex-disk_latest_amd64.deb'
-#Text colors
+
+# Text colors
 RED='\033[0;31m'
 RESET_COLOR='\033[0m' # No Color
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-#Text background colors 
+# Text background colors 
 BACK_Green='\033[42m'
 BACK_Blue='\033[44m'
 BACK_Yellow='\033[43m'
 RESET_BACK_COLOR='\033[m' # Reset Background color
+BACK_MAGENTA='\033[35m'
+
+# TODO add JAVA installer , think about phpstorm,clion
+YANDEXDISK='http://repo.yandex.ru/yandex-disk/yandex-disk_latest_amd64.deb'
+
+# github info
+GITHUB_NAME='ashe23'
+GITHUB_EMAIL='ashot7410@gmail.com'
+
+# Projects folder config
+PROJECTS_ROOT_DIR='Projects'
+
+# Downloadable programs
+SKYPE_ALPHA_URL='https://www.skype.com/en/download-skype/skype-for-linux/downloading-web/?type=weblinux-deb'
   
 checkForRoot() {
 	if [ "$(id -u)" != "0" ]; then
-	   echo "${RED}This script must be run as root ${RESET}" 1>&2
+	   echo "${RED}This script must be run as root ${RESET_COLOR}" 1>&2
 	   exit 1
 	fi
 }
 
-createAliasFile() {
-	#TODO if alias file exits change it? replace ? or delete and add new one?
+createAliasFileAndAddProjectDir() {
 	cd $HOME
-	touch .bash_aliases
-cat <<ALIASES >> .bash_aliases
-alias desk="cd $HOME/Desktop "
+	mkdir -p $PROJECTS_ROOT_DIR
+	# checks if .bash_aliases file exists
+	if [ -f $HOME/.bash_aliases ]; then
+    	echo "${RED}File  .bash_aliases already exists! Do you want to replace it? (y/N)${RESET_COLOR}"
+    	read replaceFile
+    	if [ "$replaceFile" = 'y' ] || [ "$replaceFile" = 'Y' ]; then
+			echo 'alias desk="cd $HOME/Desktop"
 alias sysupd="sudo apt-get update"
 alias sysupg="sudo apt-get upgrade"
 alias yd="cd $HOME/Yandex.Disk"
-ALIASES
+alias dow="cd $HOME/Downloads"
+alias projects="cd $HOME/'$PROJECTS_ROOT_DIR'"' > .bash_aliases		
+		else
+			echo 'skipping...'
+		fi
+	fi
 }
 
 show_OScomponents() {
-	echo "${BACK_Yellow}OS components${RESET_BACK_COLOR}\n"
+	echo "${BACK_MAGENTA}OS components${RESET_BACK_COLOR}\n"
 	isProgInstalled mc
 	isProgInstalled git
 	isProgInstalled curl
 	isProgInstalled htop
 	isProgInstalled top
-	isProgInstalled subl	
+	isProgInstalled subl
 	isProgInstalled google-chrome-stable
 	isProgInstalled skype		
 	isProgInstalled yandex-disk		
@@ -50,7 +71,7 @@ show_OScomponents() {
 }
 
 show_WEBcomponents() {
-	echo "${BACK_Yellow}WEB components${RESET_BACK_COLOR}\n"
+	echo "${BACK_MAGENTA}WEB components${RESET_BACK_COLOR}\n"
 	isProgInstalled composer	
 	isProgInstalled bower
 	isProgInstalled phpunit
@@ -73,6 +94,18 @@ isProgInstalled() {
 		echo >&2 "${GREEN}✔ '${1}' installed.${RESET_COLOR}"; 
 	else
 		echo >&2 "${RED}✘ '${1}' not installed.${RESET_COLOR}"; 		
+	fi	
+}
+
+bIsInstalled() {
+	local result=1	
+	command -v ${1} >/dev/null 2>&1 || { 
+		local result=0;		
+	}	
+	if [ $result -eq 1 ]; then
+		return 1;
+	else
+		return 0;
 	fi	
 }
 
@@ -101,9 +134,12 @@ install_MC() {
 }
 
 install_Git() {
-	apt-get install git
+	apt install git
 	# filemode change ignore
 	git config --global core.filemode false
+	# default credentials
+	git config --global user.name $GITHUB_NAME
+	git config --global user.email $GITHUB_EMAIL
 }
 
 install_HTOP() {
@@ -168,9 +204,8 @@ install_CherryTree() {
 	apt-get install cherrytree
 }
 
-install_VLCplayer() {
-	add-apt-repository ppa:videolan/stable-daily
-	apt-get install vlc
+install_VLCplayer() {	
+	apt install vlc
 
 }
 
@@ -179,9 +214,52 @@ install_YOUTUBEDL() {
 	apt-get install youtube-dl
 }
 
+install_Archivators () {
+	sudo apt install p7zip-full p7zip-rar
+	# do it right extraction
+	# link: https://brettcsmith.org/2007/dtrx/
+	sudo apt install dtrx
+}
+
+install_OKULAR () {
+	bIsInstalled okular
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		apt install okular
+	fi
+}
+
+installEssentialPrograms() {
+	#apt update
+	#createAliasFileAndAddProjectDir
+	#install_MC
+	#install_Git
+	#install_Sublime3
+	#install_VLCplayer
+	#install_Archivators
+	install_OKULAR
+	# okular
+	# gwenview
+	# sublime
+	# skype
+	# cherryTree
+	# KeePassX
+	# VLC
+	# ThunderBird
+	# 7zip,dtrx
+	# Gimp
+	# Libre Office
+	# Meld diff
+	# Joxy
+	# Git
+	# Yandex Disk
+	# xmind
+	#apt upgrade
+}
+
 installOScomponents() {
 	apt-get update
-	createAliasFile
+	createAliasFileAndAddProjectDir
 	install_OpenGL
 	install_MC
 	install_Git
@@ -220,7 +298,7 @@ if [ "$1" = "-i" ]; then
 	exit 1;
 fi
 
-#showing which programs are installed and whic are not
+#showing which programs are installed and which are not
 echo '\n'
 	show_OScomponents
 	echo '\n'
@@ -238,8 +316,9 @@ if [ "$question" = "y" ] || [ "$question" = "Y" ]; then
 		exit 1;
 	elif [ "$component" = "y" ] || [ "$component" = "Y" ]; then
 		echo "installing both..."
-		installOScomponents
-		installWEBcomponents
+		installEssentialPrograms
+		#installOScomponents
+		#installWEBcomponents
 		show_OScomponents
 		echo '\n'
 		show_WEBcomponents
