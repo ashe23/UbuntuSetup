@@ -133,6 +133,7 @@ install_MC() {
 	apt-get install mc
 }
 
+
 install_Git() {
 	apt install git
 	# filemode change ignore
@@ -229,6 +230,15 @@ install_OKULAR () {
 	fi
 }
 
+# installing minimal program bundles
+installMinimalBundle() {
+	install_MC
+	install_Git
+	install_HTOP
+	createAliasFileAndAddProjectDir
+	install_Archivators
+}
+
 installEssentialPrograms() {
 	#apt update
 	#createAliasFileAndAddProjectDir
@@ -316,7 +326,8 @@ if [ "$question" = "y" ] || [ "$question" = "Y" ]; then
 		exit 1;
 	elif [ "$component" = "y" ] || [ "$component" = "Y" ]; then
 		echo "installing both..."
-		installEssentialPrograms
+		installMinimalBundle
+		#installEssentialPrograms
 		#installOScomponents
 		#installWEBcomponents
 		show_OScomponents
