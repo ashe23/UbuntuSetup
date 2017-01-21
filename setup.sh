@@ -38,17 +38,17 @@ createAliasFileAndAddProjectDir() {
 	mkdir -p $PROJECTS_ROOT_DIR
 	# checks if .bash_aliases file exists
 	if [ -f $HOME/.bash_aliases ]; then
-    	echo "${RED}File  .bash_aliases already exists! Do you want to replace it? (y/N)${RESET_COLOR}"
+    	echo "${RED}File  .bash_aliases already exists! Do you want to replace it? (y/N)${RESET_COLOR}";
     	read replaceFile
     	if [ "$replaceFile" = 'y' ] || [ "$replaceFile" = 'Y' ]; then
 			echo 'alias desk="cd $HOME/Desktop"
-alias sysupd="sudo apt-get update"
-alias sysupg="sudo apt-get upgrade"
+alias sysupd="sudo apt update"
+alias sysupg="sudo apt upgrade"
 alias yd="cd $HOME/Yandex.Disk"
 alias dow="cd $HOME/Downloads"
-alias projects="cd $HOME/'$PROJECTS_ROOT_DIR'"' > .bash_aliases		
+alias projects="cd $HOME/'$PROJECTS_ROOT_DIR'"' > .bash_aliases;
 		else
-			echo 'skipping...'
+			echo 'skipping...';
 		fi
 	fi
 }
@@ -85,7 +85,7 @@ show_WEBcomponents() {
 
 }
 
-isProgInstalled() {	
+isProgInstalled() {
 	local result=1	
 	command -v ${1} >/dev/null 2>&1 || { 
 		local result=0;		
@@ -110,27 +110,32 @@ bIsInstalled() {
 }
 
 install_LAMP() {
-	apt-get install apache2
-	apt-get install mysql-server
-	apt-get install php libapache2-mod-php php-mcrypt php-mysql
+	apt install apache2
+	apt install mysql-server
+	apt install php libapache2-mod-php php-mcrypt php-mysql
 }
 
 
 install_YandexDisk() {
 	wget -P $HOME $YANDEXDISK
 	cd $HOME
-	dpkg -i yandex-disk_latest_amd64.deb	
+	dpkg -i yandex-disk_latest_amd64.deb
+	yandex-disk setup
 }
 
 install_OpenGL() {
-    apt-get install freeglut3 freeglut3-dev
-    apt-get install binutils-gold
+    apt install freeglut3 freeglut3-dev
+    apt install binutils-gold
     # need this libs for ubuntu
-    apt-get install libxmu-dev libxi-dev
+    apt install libxmu-dev libxi-dev
+}
+
+install_compilers() {
+	apt install g++
 }
 
 install_MC() {
-	apt-get install mc
+	apt install mc
 }
 
 
@@ -144,13 +149,17 @@ install_Git() {
 }
 
 install_HTOP() {
-	apt-get install htop
+	apt install htop
+}
+
+install_CURL() {
+	apt install curl
 }
 
 install_Chrome() {
 	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 	sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-	apt-get install google-chrome-stable
+	apt install google-chrome-stable
 }
 
 install_Skype(){
@@ -158,17 +167,17 @@ install_Skype(){
 	# if it isn't already enabled by running the command 
 	dpkg --add-architecture i386
 	add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
-	apt-get install skype
+	apt install skype
 }
 
 install_Gimp() {
 	add-apt-repository ppa:otto-kesselgulasch/gimp
-	apt-get install gimp
+	apt install gimp
 }
 
 install_Sublime3() {
 	add-apt-repository ppa:webupd8team/sublime-text-3
-	apt-get install sublime-text-installer
+	apt install sublime-text-installer
 }
 
 install_Composer() {
@@ -189,9 +198,9 @@ install_PHPUnit() {
 
 install_NODEJS() {
 	curl -sL https://deb.nodesource.com/setup | sudo bash -
-	apt-get install nodejs
-	apt-get install build-essential
-	apt-get install npm
+	apt install nodejs
+	apt install build-essential
+	apt install npm
 }
 
 
@@ -202,7 +211,7 @@ install_NodePackages() {
 
 install_CherryTree() {
 	add-apt-repository ppa:vincent-c/cherrytree
-	apt-get install cherrytree
+	apt install cherrytree
 }
 
 install_VLCplayer() {	
@@ -212,7 +221,7 @@ install_VLCplayer() {
 
 install_YOUTUBEDL() {
 	add-apt-repository ppa:nilarimogard/webupd8
-	apt-get install youtube-dl
+	apt install youtube-dl
 }
 
 install_Archivators () {
@@ -232,22 +241,20 @@ install_OKULAR () {
 
 # installing minimal program bundles
 installMinimalBundle() {
+	createAliasFileAndAddProjectDir
 	install_MC
 	install_Git
 	install_HTOP
-	createAliasFileAndAddProjectDir
 	install_Archivators
 }
 
 installEssentialPrograms() {
-	#apt update
-	#createAliasFileAndAddProjectDir
-	#install_MC
-	#install_Git
-	#install_Sublime3
-	#install_VLCplayer
-	#install_Archivators
-	install_OKULAR
+	apt update
+	install_Sublime3	
+	install_CherryTree
+	install_VLCplayer
+	install_YOUTUBEDL
+	apt upgrade
 	# okular
 	# gwenview
 	# sublime
@@ -268,7 +275,7 @@ installEssentialPrograms() {
 }
 
 installOScomponents() {
-	apt-get update
+	apt update
 	createAliasFileAndAddProjectDir
 	install_OpenGL
 	install_MC
@@ -281,18 +288,18 @@ installOScomponents() {
 	install_CherryTree
 	install_YOUTUBEDL
 	install_YandexDisk
-	apt-get upgrade
+	apt upgrade
 }
 
 installWEBcomponents() {
-	apt-get update
+	apt update
 	install_LAMP
 	install_Composer
 	install_NODEJS
 	install_Symfony
 	install_PHPUnit
 	install_NodePackages
-	apt-get upgrade
+	apt upgrade
 }
 
 
@@ -327,7 +334,8 @@ if [ "$question" = "y" ] || [ "$question" = "Y" ]; then
 	elif [ "$component" = "y" ] || [ "$component" = "Y" ]; then
 		echo "installing both..."
 		installMinimalBundle
-		#installEssentialPrograms
+		installEssentialPrograms
+		install_YandexDisk
 		#installOScomponents
 		#installWEBcomponents
 		show_OScomponents
