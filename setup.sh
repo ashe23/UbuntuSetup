@@ -28,7 +28,7 @@ SKYPE_ALPHA_URL='https://www.skype.com/en/download-skype/skype-for-linux/downloa
   
 checkForRoot() {
 	if [ "$(id -u)" != "0" ]; then
-	   echo "${RED}This script must be run as root ${RESET_COLOR}" 1>&2
+	   echo "${RED}I cant see your root rights.${RESET_COLOR}" 1>&2
 	   exit 1
 	fi
 }
@@ -49,25 +49,25 @@ alias dow="cd $HOME/Downloads"
 alias projects="cd $HOME/'$PROJECTS_ROOT_DIR'"' > .bash_aliases;
 		else
 			echo 'skipping...';
+			sleep 1s;
 		fi
 	fi
 }
 
-show_OScomponents() {
-	echo "${BACK_MAGENTA}OS components${RESET_BACK_COLOR}\n"
+showProgramList() {
+	echo "${BACK_MAGENTA}List of programs${RESET_BACK_COLOR}\n"
 	isProgInstalled mc
 	isProgInstalled git
 	isProgInstalled curl
 	isProgInstalled htop
 	isProgInstalled top
 	isProgInstalled subl
-	isProgInstalled google-chrome-stable
-	isProgInstalled skype		
-	isProgInstalled yandex-disk		
+	isProgInstalled yandex-disk
 	isProgInstalled gimp		
 	isProgInstalled cherrytree
 	isProgInstalled youtube-dl		
-	isProgInstalled vlc		
+	isProgInstalled vlc
+	isProgInstalled keepass2
 }
 
 show_WEBcomponents() {
@@ -82,7 +82,6 @@ show_WEBcomponents() {
 	isProgInstalled nodejs
 	isProgInstalled npm
 	isProgInstalled modernizr
-
 }
 
 isProgInstalled() {
@@ -117,10 +116,14 @@ install_LAMP() {
 
 
 install_YandexDisk() {
-	wget -P $HOME $YANDEXDISK
-	cd $HOME
-	dpkg -i yandex-disk_latest_amd64.deb
-	yandex-disk setup
+    bIsInstalled yandex-disk
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		wget -P $HOME $YANDEXDISK
+        cd $HOME
+        dpkg -i yandex-disk_latest_amd64.deb
+        yandex-disk setup
+	fi
 }
 
 install_OpenGL() {
@@ -156,28 +159,22 @@ install_CURL() {
 	apt install curl
 }
 
-install_Chrome() {
-	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-	sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-	apt install google-chrome-stable
-}
-
-install_Skype(){
-	# Users of 64-bit Ubuntu, should enable MultiArch
-	# if it isn't already enabled by running the command 
-	dpkg --add-architecture i386
-	add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
-	apt install skype
-}
-
 install_Gimp() {
-	add-apt-repository ppa:otto-kesselgulasch/gimp
-	apt install gimp
+    bIsInstalled gimp
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		add-apt-repository ppa:otto-kesselgulasch/gimp
+	    apt install gimp
+	fi
 }
 
 install_Sublime3() {
-	add-apt-repository ppa:webupd8team/sublime-text-3
-	apt install sublime-text-installer
+    bIsInstalled subl
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		add-apt-repository ppa:webupd8team/sublime-text-3
+	    apt install sublime-text-installer
+	fi
 }
 
 install_Composer() {
@@ -210,18 +207,25 @@ install_NodePackages() {
 }
 
 install_CherryTree() {
-	add-apt-repository ppa:vincent-c/cherrytree
-	apt install cherrytree
+    bIsInstalled cherrytree
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		add-apt-repository ppa:vincent-c/cherrytree
+	    apt install cherrytree
+	fi
 }
 
 install_VLCplayer() {	
 	apt install vlc
-
 }
 
 install_YOUTUBEDL() {
-	add-apt-repository ppa:nilarimogard/webupd8
-	apt install youtube-dl
+    bIsInstalled youtube-dl
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		add-apt-repository ppa:nilarimogard/webupd8
+	    apt install youtube-dl
+	fi
 }
 
 install_Archivators () {
@@ -242,10 +246,26 @@ install_OKULAR () {
 # installing minimal program bundles
 installMinimalBundle() {
 	createAliasFileAndAddProjectDir
+	install_compilers
 	install_MC
 	install_Git
 	install_HTOP
+	install_CURL
 	install_Archivators
+	install_OKULAR
+}
+
+install_KeePassX() {
+    bIsInstalled keepass2
+	return_val=$?
+	if [ "$return_val" -eq "0" ];then
+		apt-add-repository ppa:jtaylor/keepass
+        apt install keepass2
+	fi
+}
+
+install_MeldDiff() {
+    apt install meld
 }
 
 installEssentialPrograms() {
@@ -254,39 +274,9 @@ installEssentialPrograms() {
 	install_CherryTree
 	install_VLCplayer
 	install_YOUTUBEDL
-	apt upgrade
-	# okular
-	# gwenview
-	# sublime
-	# skype
-	# cherryTree
-	# KeePassX
-	# VLC
-	# ThunderBird
-	# 7zip,dtrx
-	# Gimp
-	# Libre Office
-	# Meld diff
-	# Joxy
-	# Git
-	# Yandex Disk
-	# xmind
-	#apt upgrade
-}
-
-installOScomponents() {
-	apt update
-	createAliasFileAndAddProjectDir
-	install_OpenGL
-	install_MC
-	install_Git
-	install_HTOP
-	install_Chrome
-	install_Skype
+	install_KeePassX
+	install_MeldDiff
 	install_Gimp
-	install_Sublime3
-	install_CherryTree
-	install_YOUTUBEDL
 	install_YandexDisk
 	apt upgrade
 }
@@ -302,63 +292,72 @@ installWEBcomponents() {
 	apt upgrade
 }
 
+# initial function that accepts user input and asking question which programs to install
+init() {
+    # script must run from root , or root rights ex."sudo"
+    checkForRoot
+    # showing which programs are installed and which are not
+    echo '\n'
+    showProgramList
+    echo '\n'
+    show_WEBcomponents
+    echo '\n'
+    echo "${BLUE}Do you want to install missing programs?(y/N):${RESET_COLOR}"
 
-checkForRoot
+    # ask user to install missing programs
+    read question
+    if [ "$question" = "y" ] || [ "$question" = "Y" ]; then
+        echo "${BLUE}Both WEB and OS components? (y - both, 1 - only OS , 2 - only WEB):${RESET_COLOR}"
+        read component
+        if [ -z "$component" ]; then
+            echo "Aborting."
+            exit 1;
+        elif [ "$component" = "y" ] || [ "$component" = "Y" ]; then
+            echo "installing both..."
+            sleep 2s
+            installMinimalBundle
+            installEssentialPrograms
+            #installWEBcomponents
+            showProgramList
+            echo '\n'
+            show_WEBcomponents
+            echo '\n'
+        elif [ "$component" -eq "1" ]; then
+            echo "installing OS..."
+            sleep 2s;
+            installMinimalBundle
+            installEssentialPrograms
+            echo '\n'
+            showProgramList
+            echo '\n'
+        elif [ "$component" -eq "2" ]; then
+            echo "installing WEB..."
+            sleep 2s;
+            installWEBcomponents
+            echo '\n'
+            show_WEBcomponents
+            echo '\n'
+        fi
+    else
+        echo "Aborting."
+        exit 1;
+    fi
+}
 
 # if -i flag used we just showing information about programs
 if [ "$1" = "-i" ]; then
 	echo '\n'
-	show_OScomponents
+	showProgramList
 	echo '\n'
 	show_WEBcomponents
 	echo '\n'
 	exit 1;
 fi
-
-#showing which programs are installed and which are not
-echo '\n'
-	show_OScomponents
-	echo '\n'
-	show_WEBcomponents
-	echo '\n'
-echo "${BLUE}Do you want to install missing programs?(y/N):${RESET_COLOR}"
-
-#ask user to install missing programs
-read question
-if [ "$question" = "y" ] || [ "$question" = "Y" ]; then
-	echo "${BLUE}Both WEB and OS componets?(y - both, 1 - only OS , 2 - only WEB):${RESET_COLOR}"
-	read component
-	if [ -z "$component" ]; then
-		echo "Aborting."
-		exit 1;
-	elif [ "$component" = "y" ] || [ "$component" = "Y" ]; then
-		echo "installing both..."
-		installMinimalBundle
-		installEssentialPrograms
-		install_YandexDisk
-		#installOScomponents
-		#installWEBcomponents
-		show_OScomponents
-		echo '\n'
-		show_WEBcomponents
-		echo '\n'
-	elif [ "$component" -eq "1" ]; then
-		echo "installing OS..."
-		installOScomponents
-		echo '\n'
-		show_OScomponents	
-		echo '\n'
-	elif [ "$component" -eq "2" ]; then
-		echo "installing WEB..."
-		installWEBcomponents
-		echo '\n'
-		show_WEBcomponents	
-		echo '\n'		
-	fi			
-else
-	echo "Aborting."
-	exit 1;
+# -y flag for installing only yandex disk
+if [ "$1" = "-y" ]; then
+    echo '\nInstalling Yandex disk\n';
+    sleep 2s;
+    yandex-disk setup
 fi
-
-
-
+# script start here
+init

@@ -1,1 +1,10 @@
-.idea
+# ignore all
+*
+# only not this files
+!.gitignore
+!setup.sh
+!README.md
+# even if they are in subdirectories
+!*/
+.idea/
+cmake-build-debug/

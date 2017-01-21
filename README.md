@@ -9,3 +9,4 @@ sudo sh setup.sh or ./setup.sh
 
 # Additional info
 -i  : to get information what programs already installed on your system.
+-y  : installing only yandex disk
