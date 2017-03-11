@@ -1,5 +1,5 @@
-# System initial setup - SIO v1.0
-Simple bash script for installing essential programs and tools on clean machine. (Tired doing it all time ! :) )<br />
+# System initial setup
+Simple bash script for installing essential programs and tools on clean machine.<br />
 Installing most used programs on ubuntu based systems just in one line.(I created list for my own, but you can bravely add yours)
 # Usage 
 # NOTE: You must be root to use it
