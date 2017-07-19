@@ -34,6 +34,7 @@ checkForRoot() {
 }
 
 createAliasFileAndAddProjectDir() {
+	# TODO:ashe23
 	cd $HOME
 	mkdir -p $PROJECTS_ROOT_DIR
 	# checks if .bash_aliases file exists
@@ -245,14 +246,12 @@ install_OKULAR () {
 
 # installing minimal program bundles
 installMinimalBundle() {
-	createAliasFileAndAddProjectDir
+	# createAliasFileAndAddProjectDir
 	install_compilers
 	install_MC
 	install_Git
 	install_HTOP
 	install_CURL
-	install_Archivators
-	install_OKULAR
 }
 
 install_KeePassX() {
@@ -270,7 +269,9 @@ install_MeldDiff() {
 
 installEssentialPrograms() {
 	apt update
+	install_Archivators
 	install_Sublime3	
+	install_OKULAR
 	install_CherryTree
 	install_VLCplayer
 	install_YOUTUBEDL
@@ -317,7 +318,7 @@ init() {
             sleep 2s
             installMinimalBundle
             installEssentialPrograms
-            #installWEBcomponents
+            installWEBcomponents
             showProgramList
             echo '\n'
             show_WEBcomponents
@@ -359,5 +360,12 @@ if [ "$1" = "-y" ]; then
     sleep 2s;
     yandex-disk setup
 fi
+# -m flag for installing only minimal bundle
+if [ "$1" = "-m" ]; then
+    echo '\nInstalling minimal bundle\n';
+    sleep 2s;
+    installMinimalBundle
+fi
+
 # script start here
 init
