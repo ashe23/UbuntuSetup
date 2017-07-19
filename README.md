@@ -8,3 +8,4 @@ sudo sh setup.sh or ./setup.sh
 # Additional info
 -i  : to get information what programs already installed on your system.<br />
 -y  : installing only yandex disk
+-m  : minimal bundle
