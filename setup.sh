@@ -365,6 +365,7 @@ if [ "$1" = "-m" ]; then
     echo '\nInstalling minimal bundle\n';
     sleep 2s;
     installMinimalBundle
+    exit 1;
 fi
 
 # script start here
